@@ -1506,14 +1506,14 @@ def move_items(lib, dest, query, copy, album, pretend, confirm=False,
 
             if export:
                 # Copy without affecting the database.
-                obj.move(operation=MoveOperation.COPY, basedir=dest,
+                obj.try_move(operation=MoveOperation.COPY, basedir=dest,
                          store=False)
             else:
                 # Ordinary move/copy: store the new path.
                 if copy:
-                    obj.move(operation=MoveOperation.COPY, basedir=dest)
+                    obj.try_move(operation=MoveOperation.COPY, basedir=dest)
                 else:
-                    obj.move(operation=MoveOperation.MOVE, basedir=dest)
+                    obj.try_move(operation=MoveOperation.MOVE, basedir=dest)
 
 
 def move_func(lib, opts, args):

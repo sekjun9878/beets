@@ -29,7 +29,7 @@ from beets.mediafile import MediaFile, UnreadableFileError
 from beets import plugins
 from beets import util
 from beets.util import bytestring_path, syspath, normpath, samefile, \
-    MoveOperation
+    MoveOperation, FilesystemError
 from beets.util.functemplate import Template
 from beets import dbcore
 from beets.dbcore import types
@@ -811,6 +811,22 @@ class Item(LibModel):
         if operation == MoveOperation.MOVE:
             util.prune_dirs(os.path.dirname(old_path), self._db.directory)
 
+    def try_move(self, operation=MoveOperation.MOVE, basedir=None,
+                 with_album=True, store=True):
+        """
+        Calls `move()` but catches and logs `FilesystemError`
+        exceptions.
+
+        Returns `False` an exception was caught and `True` otherwise.
+        """
+        try:
+            self.move(operation, basedir, with_album, store)
+            return True
+        except FilesystemError as exc:
+            exc.error_kind = 'Warning'
+            exc.log(log)
+            return False
+
     # Templating.
 
     def destination(self, fragment=False, basedir=None, platform=None,
@@ -1075,6 +1091,22 @@ class Album(LibModel):
         self.move_art(operation)
         if store:
             self.store()
+
+    def try_move(self, operation=MoveOperation.MOVE, basedir=None,
+                 store=True):
+        """
+        Calls `move()` but catches and logs `FilesystemError`
+        exceptions.
+
+        Returns `False` an exception was caught and `True` otherwise.
+        """
+        try:
+            self.move(operation, basedir, store)
+            return True
+        except FilesystemError as exc:
+            exc.error_kind = 'Warning'
+            exc.log(log)
+            return False
 
     def item_dir(self):
         """Returns the directory containing the album's first item,
