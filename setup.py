@@ -89,7 +89,7 @@ setup(
         'six>=1.9',
         'mutagen>=1.33',
         'munkres',
-        'unidecode',
+        'unidecode=0.04.21',
         'musicbrainzngs>=0.4',
         'pyyaml',
         'jellyfish',
